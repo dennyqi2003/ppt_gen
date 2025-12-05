@@ -1,0 +1,37 @@
+name: Build PPT Tools
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch: 
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install python-pptx openai pyinstaller
+
+    - name: Build AI Version
+      run: |
+        pyinstaller --onefile --name convert_ai convert_ai.py
+
+    - name: Build Traditional Version
+      run: |
+        pyinstaller --onefile --name convert_traditional convert_traditional.py
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: PPT-Gen-Tools-Pack
+        path: dist/*.exe
